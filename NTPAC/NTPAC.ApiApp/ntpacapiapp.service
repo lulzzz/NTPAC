@@ -1,0 +1,22 @@
+# /usr/lib/systemd/user/ntpacapiapp.service
+
+[Unit]
+Description=NTPAC API App
+After=network.target
+
+[Service]
+PIDFile=/var/run/ntpac/ntpacapiapp.pid
+User=marta
+Group=marta
+Environment=ASPNETCORE_URLS=http://*:5000
+ExecStart=/home/marta/ntpac/NTPAC.ApiApp/NTPAC.ApiApp Repository:Provider=cassandra Repository:ContactPoint=10.0.3.7
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=100000
+LimitMEMLOCK=infinity
+LimitNPROC=32768
+LimitAS=infinity
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

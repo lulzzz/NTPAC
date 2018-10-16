@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>NTPAC.Reassembling.Tests</AssemblyName>
+    <RootNamespace>NTPAC.Reassembling.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="Moq" Version="4.10.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Libs\Microsoft.Extensions.Logging.XunitLogger\Microsoft.Extensions.Logging.XunitLogger.csproj" />
+    <ProjectReference Include="..\NTPAC.Common\NTPAC.Common.csproj">
+      <Project>{E2D0ABFD-362D-4E08-81E7-8710EFAE09F1}</Project>
+      <Name>NTPAC.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NTPAC.PcapLoader\NTPAC.PcapLoader.csproj">
+      <Project>{912FACDC-41F9-40FF-AAEA-783813BAE355}</Project>
+      <Name>NTPAC.PcapLoader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NTPAC.Reassembling\NTPAC.Reassembling.csproj">
+      <Project>{AC2085C4-9504-483D-84D8-BD02E08B654B}</Project>
+      <Name>NTPAC.Reassembling</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

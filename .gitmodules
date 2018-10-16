@@ -1,0 +1,3 @@
+[submodule "NTPAC/TestingData"]
+	path = NTPAC/TestingData
+	url = https://nessc.fit.vutbr.cz/tfs/Marta/NTPAC/_git/TestingData

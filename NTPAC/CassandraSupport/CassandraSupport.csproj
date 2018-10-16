@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="UnitOfWork.CassandraRepository" Version="1.0.1" />
+    <PackageReference Include="UnitOfWork.CassandraUnitOfWork" Version="1.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NTPAC.ConversationTracking\NTPAC.ConversationTracking.csproj" />
+    <ProjectReference Include="..\NTPAC.DTO\NTPAC.DTO.csproj" />
+    <ProjectReference Include="..\NTPAC.Persistence.Cassandra.Entities\NTPAC.Persistence.Cassandra.Entities.csproj" />
+    <ProjectReference Include="..\NTPAC.Reassembling\NTPAC.Reassembling.csproj" />
+  </ItemGroup>
+</Project>

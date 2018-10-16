@@ -1,0 +1,32 @@
+version: '3.5'
+
+# m+n node cluster
+# If you see exit code 137 (OOM killer) then ensure Docker has access to more resources
+services:
+  cassandra-seed-node:
+    image: docker.nesad.fit.vutbr.cz/cassandra:latest
+    environment:
+      - "CASSANDRA_SEEDS=tasks.cassandra-seed-node"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.cassandra-seed == true
+
+  cassandra-node:
+    image: docker.nesad.fit.vutbr.cz/cassandra:latest
+    environment:
+      - "CASSANDRA_SEEDS=tasks.cassandra-seed-node"
+    command: /bin/bash -c "T=$$((  RANDOM % 30  + 20 )); echo \"Waiting for seed node ($$T s)\" && sleep $$T && /ntpac-docker-entrypoint.sh cassandra -f"
+    depends_on:
+      - "cassandra-seed-node"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.cassandra == true
+
+networks:
+  default:
+    attachable: true
+

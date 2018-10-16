@@ -1,0 +1,28 @@
+version: '3.5'
+
+services:
+  lighthouse:
+    image: docker.nesad.fit.vutbr.cz/lighthouse:latest
+    environment:
+      - NTPAC_NODE=lighthouse
+    deploy:
+      placement:
+        constraints:
+          - node.labels.lighthouse == true
+
+  reassembler:
+    image: docker.nesad.fit.vutbr.cz/reassembler:latest
+    command: --devnull-repository
+    environment:
+      - NTPAC_SEED_NODE=lighthouse:7070
+    depends_on:
+      - lighthouse
+    deploy:
+      replicas: 5
+      placement:
+        constraints:
+          - node.labels.reassembler == true
+
+networks:
+  default:
+    attachable: true

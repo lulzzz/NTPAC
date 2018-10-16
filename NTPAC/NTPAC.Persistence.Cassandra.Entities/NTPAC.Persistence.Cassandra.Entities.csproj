@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="UnitOfWork" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="UnitOfWork.BaseDataEntity">
+      <HintPath>..\..\..\..\..\.nuget\packages\unitofwork.basedataentity\1.0.1\lib\netstandard2.0\UnitOfWork.BaseDataEntity.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Lighthouse.NetCoreApp</RootNamespace>
+    <AssemblyTitle>Lighthouse.NetCoreApp</AssemblyTitle>
+    <AssemblyName>Lighthouse.NetCoreApp</AssemblyName>
+    <Description>Lighthouse.NetCoreApp</Description>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Akka" Version="1.3.9" />
+    <PackageReference Include="Akka.Cluster" Version="1.3.9" />
+    <PackageReference Include="Akka.Logger.NLog" Version="1.3.3" />
+    <PackageReference Include="Akka.Cluster.Tools" Version="1.3.9" />
+    <PackageReference Include="Akka.Remote" Version="1.3.9" />
+    <PackageReference Include="Akka.Serialization.Hyperion" Version="1.3.9-beta68" />
+    <PackageReference Include="Akka.Serialization.MessagePack" Version="1.1.0" />
+    <PackageReference Include="CommandLineParser" Version="2.3.0" />
+    <PackageReference Include="DotNetty.Handlers" Version="0.5.0" />
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="lightHouse.hocon">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="App.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="run.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

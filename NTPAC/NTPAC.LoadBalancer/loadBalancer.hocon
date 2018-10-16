@@ -1,0 +1,41 @@
+﻿ntpac-loadbalancer {
+    batch-flush-interval = 10
+    batch-raw-capture-size = 50000
+    batch-size = 5000
+    batch-parallel-transmissions-per-reassembler = 500
+    shards-per-entity = 10
+    askable-message-reply-timeout = 30
+    gc-dely = 120
+    gc-interval = 120
+} 
+
+akka {
+  stdout-loglevel = INFO
+  loglevel = INFO
+
+  actor {
+    provider = cluster
+    serializers {
+        messagepack = "Akka.Serialization.MessagePack.MsgPackSerializer, Akka.Serialization.MessagePack"
+        bytes = "Akka.Serialization.ByteArraySerializer"
+        hyperion = "Akka.Serialization.HyperionSerializer, Akka.Serialization.Hyperion"
+    }
+    serialization-bindings {
+      "System.Object" = hyperion
+      "System.Byte[]" = bytes
+      }
+    }
+
+  remote {
+    dot-netty.tcp {
+      port = 0
+      hostname = 127.0.0.1
+      maximum-frame-size = 500000
+    }
+  }
+  cluster {
+    auto-down-unreachable-after = 10s
+    seed-nodes = ["akka.tcp://NTPAC-Cluster@127.0.0.1:7070"]
+    roles = ["loadbalancer"]
+  }
+}

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <DockerComposeProjectPath>..\NTPAC\docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.19.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NTPAC.Persistence.Cassandra.Facades\NTPAC.Persistence.Cassandra.Facades.csproj" />
+    <ProjectReference Include="..\NTPAC.Persistence.Cassandra.Migrations\NTPAC.Persistence.Cassandra.Migrations.csproj" />
+    <ProjectReference Include="..\NTPAC.Persistence.InMemory.Facades\NTPAC.Persistence.InMemory.Facades.csproj" />
+    <ProjectReference Include="..\NTPAC.Persistence.Interfaces\NTPAC.Persistence.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>

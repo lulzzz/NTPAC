@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NTPAC.LoadBalancerCli": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\big.pcap  --offline"
+    }
+  }
+}

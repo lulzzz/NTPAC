@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PacketDotNet" Version="0.19.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NTPAC.Common\NTPAC.Common.csproj" />
+    <ProjectReference Include="..\NTPAC.ConversatinTracking.Interfaces\NTPAC.ConversatinTracking.Interfaces.csproj" />
+    <ProjectReference Include="..\NTPAC.Messages\NTPAC.ConversationTracking.Messages.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UnitOfWork.BaseDataEntity">
+      <HintPath>..\..\..\..\..\.nuget\packages\unitofwork.basedataentity\1.0.1\lib\netstandard2.0\UnitOfWork.BaseDataEntity.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

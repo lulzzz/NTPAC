@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NTPAC.ReassemblerCli": {
+      "commandName": "Project",
+      "commandLineArgs": "--devnull-repository"
+    }
+  }
+}

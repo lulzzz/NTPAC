@@ -1,0 +1,141 @@
+# For all pcs in lab
+for HOST in `seq -f "h%02g" 1 14`; do echo $HOST; ssh root@$HOST 'id'; done
+
+# CentOS Docker installation
+systemctl stop docker; \
+  yum remove -y docker docker-common docker-selinux docker-engine-selinux docker-engine docker-ce && \
+  yum install -y yum-utils device-mapper-persistent-data lvm2 && \
+  yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+  yum install -y docker-ce && \
+  systemctl start docker && \
+  docker version
+
+# Stop firewalld and restart docker
+for HOST in `seq -f "h%02g" 1 19`; do echo $HOST; ssh root@$HOST 'systemctl stop firewalld; systemctl restart docker'; done
+
+# Build, tag and push
+# Lighthouse
+docker build -t lighthouse -f Lighthouse.NetCoreApp/Dockerfile . && \
+  docker tag lighthouse:latest docker.nesad.fit.vutbr.cz/lighthouse:latest && \
+  docker push docker.nesad.fit.vutbr.cz/lighthouse:latest
+# Reassembler
+docker build -t reassembler -f NTPAC.ReassemblerCli/Dockerfile . && \
+  docker tag reassembler:latest docker.nesad.fit.vutbr.cz/reassembler:latest && \
+  docker push docker.nesad.fit.vutbr.cz/reassembler:latest
+# Loadbalancer
+docker build -t loadbalancer -f NTPAC.LoadBalancerCli/Dockerfile . && \
+  docker tag loadbalancer:latest docker.nesad.fit.vutbr.cz/loadbalancer:latest && \
+  docker push docker.nesad.fit.vutbr.cz/loadbalancer:latest
+# PcapLoaderBenchmark
+docker build -t pcaploaderbenchmark -f NTPAC.PcapLoader.Benchmark/Dockerfile . && \
+  docker tag pcaploaderbenchmark:latest docker.nesad.fit.vutbr.cz/pcaploaderbenchmark:latest && \
+  docker push docker.nesad.fit.vutbr.cz/pcaploaderbenchmark:latest
+# Cassandra
+docker build -t cassandra . && \
+  docker tag cassandra:latest docker.nesad.fit.vutbr.cz/cassandra:latest && \
+  docker push docker.nesad.fit.vutbr.cz/cassandra:latest
+
+# Get Docker swarm join token
+docker swarm init --advertise-addr IP
+docker swarm join-token worker
+
+# Setup registry auth
+docker login -u ntpac https://docker.nesad.fit.vutbr.cz
+
+# Label setup and constrains
+# docker service create --name cassandra_seed_node --replicas 1 --constraint 'node.labels.db==true' -p 9042:9042 cassandra
+docker node update --label-add reassembler=true h16
+docker node ls -q | xargs docker node inspect -f '{{ .ID }} [{{ .Description.Hostname }}]: {{ range $k, $v := .Spec.Labels }}{{ $k }}={{ $v }} {{end}}'
+
+# Creating service
+docker service create --name lighthouse --replicas 1 docker.nesad.fit.vutbr.cz/lighthouse
+
+# Stack deployment and subsequent removal
+docker stack deploy -c docker-compose.yml --with-registry-auth ntpac
+docker stack ls
+docker stack ps ntpac
+docker stack rm ntpac
+
+# Container shell
+docker exec -it `docker ps -q -f name=lighthouse` bash
+docker exec -it `docker ps -q -f name=reassembler` bash
+	apt update && apt install -y net-tools iputils-ping procps netcat nano
+
+docker exec -it `docker ps -q -f name=cassandra-seed-node` cqlsh
+
+docker service update --replicas=6 ntpac_reassembler 
+
+# Run Loadbalancer inside ntpac_net with attached pcap directory
+docker pull docker.nesad.fit.vutbr.cz/loadbalancer:latest
+docker run --mount type=bind,source=/root/ntpac/pcap,target=/pcap --network ntpac_default --env NTPAC_SEED_NODE=lighthouse docker.nesad.fit.vutbr.cz/loadbalancer:latest /pcap/sec6net-1gb.pcap
+docker run --volume /root/ntpac/pcap/sec6net-1gb.pcap:/pcap/sec6net-1gb.pcap --network ntpac_default --env NTPAC_SEED_NODE=lighthouse --entrypoint bash -it docker.nesad.fit.vutbr.cz/loadbalancer:latest
+
+# Run Reassembler manualy
+docker run --entrypoint 'bash' -it --network ntpac_default --env NTPAC_SEED_NODE=lighthouse docker.nesad.fit.vutbr.cz/reassembler:latest
+	sh docker-entrypoint.sh 
+
+# Remove dangling images (with no tag)
+docker rmi `docker images -f dangling=true -q`
+
+# Remove unused data
+docker system prune
+
+# Run PcapLoaderBenchmark
+docker run --mount type=bind,source=/home/vilco/pcap,target=/src/TestingData docker.nesad.fit.vutbr.cz/pcaploaderbenchmark
+
+# Get state of cassandra nodes (from seed node)
+docker exec -i `docker ps -q -f name=cassandra-seed-node` nodetool status
+
+
+docker service update --replicas=0 ntpac_reassembler; docker service update --replicas=0 ntpac_lighthouse; docker service update --replicas=1 ntpac_lighthouse; docker service update --replicas=6 ntpac_reassembler
+
+# Google Compute Engine
+# Login
+gcloud auth application-default login
+gcloud config list
+gcloud projects list
+# Create instance (docker-machine will install docker inside the newly created instance)
+docker-machine create g1 -d google --google-machine-type n1-highcpu-4 --google-tags ntpacswarm --google-project storied-channel-138110
+# List created machines / instances
+docker-machine ls
+# Start all machines
+for HOST in `docker-machine ls -q`; do docker-machine start "$HOST"; done
+gcloud compute instances list
+# SSH into the instance
+gcloud compute ssh g1
+# Set environment according to remote machine
+eval $(docker-machine env g1)
+eval $(docker-machine env -u) # Unset
+# Stop all machines
+for HOST in `docker-machine ls -q`; do docker-machine stop "$HOST"; done
+
+# Login in instance
+gcloud auth login
+# Transfer files
+HOST="g3"; gcloud compute ssh $HOST --command 'mkdir -p ~/pcap' --zone us-central1-a && gcloud compute copy-files pcap/sec6net-1gb.pcap $HOST:~/pcap/sec6net-1gb.pcap --zone us-central1-a
+
+# Create Service Account ntpac-sa
+gcloud iam service-accounts keys create --iam-account ntpac-sa
+# Generate keys in  IAM & Admin / Service accounts and export .json
+# Auth inside instance using exported json
+gcloud auth activate-service-account --key-file ntpac-sa-key.json 
+
+# Run LoadBalancer
+sudo docker run --mount type=bind,source=/home/vilco/pcap,target=/pcap --network ntpac_default --env NTPAC_SEED_NODE=lighthouse docker.nesad.fit.vutbr.cz/loadbalancer:latest /pcap/sec6net-1gb.pcap
+
+
+
+
+
+
+
+# Cassandra links
+https://github.com/medvekoma/docker-cassandra
+https://hub.docker.com/r/mcfongtw/rpi-cassandra/
+https://dzone.com/articles/swarmweek-part-1-multi-host-cassandra-cluster-with
+https://github.com/docker-library/cassandra/issues/94
+
+# GCP Docker swarm links
+https://rominirani.com/docker-swarm-on-google-compute-engine-364765b400ed
+https://docs.docker.com/machine/drivers/gce/
+https://stackoverflow.com/questions/41080692/docker-machine-google-gce-driver-not-working-unable-to-create-instance

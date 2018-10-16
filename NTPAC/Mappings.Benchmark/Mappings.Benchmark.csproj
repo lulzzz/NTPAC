@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.1" />
+    <PackageReference Include="TinyMapper" Version="3.0.2-beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NTPAC.Persistence.Cassandra.Facades\NTPAC.Persistence.Cassandra.Facades.csproj" />
+    <ProjectReference Include="..\NTPAC.Reassembling\NTPAC.Reassembling.csproj" />
+  </ItemGroup>
+
+</Project>
